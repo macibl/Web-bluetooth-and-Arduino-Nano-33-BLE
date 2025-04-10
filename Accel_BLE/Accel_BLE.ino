@@ -1,7 +1,7 @@
 #include <ArduinoBLE.h>
 #include <Arduino_LSM9DS1.h>
 
-//#define DEBUGBLE
+#define DEBUGBLE
 
 BLEService accelService("19b10000-e8f2-537e-4f6c-d104768a1214");
 
@@ -15,6 +15,9 @@ BLEFloatCharacteristic xgCharacteristic("19b10005-e8f2-537e-4f6c-d104768a1214", 
 BLEFloatCharacteristic ygCharacteristic("19b10006-e8f2-537e-4f6c-d104768a1214", BLENotify);
 BLEFloatCharacteristic zgCharacteristic("19b10007-e8f2-537e-4f6c-d104768a1214", BLENotify);
 
+BLEFloatCharacteristic xmCharacteristic("19b10008-e8f2-537e-4f6c-d104768a1214", BLENotify);
+BLEFloatCharacteristic ymCharacteristic("19b10009-e8f2-537e-4f6c-d104768a1214", BLENotify);
+BLEFloatCharacteristic zmCharacteristic("19b10010-e8f2-537e-4f6c-d104768a1214", BLENotify);
 
 BLEDevice central;
 
@@ -49,6 +52,10 @@ void setup(){
   accelService.addCharacteristic(ygCharacteristic);
   accelService.addCharacteristic(zgCharacteristic);
 
+  accelService.addCharacteristic(xmCharacteristic);
+  accelService.addCharacteristic(ymCharacteristic);
+  accelService.addCharacteristic(zmCharacteristic);
+
   BLE.addService(accelService);
 
   ledCharacteristic.writeValue(0);
@@ -67,9 +74,12 @@ void setup(){
   Serial.print("Gyroscope sample rate = ");
   Serial.print(IMU.gyroscopeSampleRate());
   Serial.println(" Hz");
+  Serial.print("Magnetometer sample rate = ");
+  Serial.print(IMU.magneticFieldSampleRate());
+  Serial.println(" Hz");
   Serial.println();
   Serial.println("Acceleration in g - Gyroscope in degrees/second");
-  Serial.println("X\tY\tZ\tX\tY\tZ");
+  Serial.println("Xa\tYa\tZa\tXg\tYg\tZg\tXm\tYm\tZm");
 }
 
 unsigned long prevTime = 0;
@@ -80,11 +90,16 @@ void loop(){
 
   float x, y, z;
   float xg, yg, zg;
+  float xm, ym, zm;
 
   IMU.readAcceleration(x, y, z);
 
   if (IMU.gyroscopeAvailable()) {
     IMU.readGyroscope(xg, yg, zg);
+  }
+
+  if (IMU.magneticFieldAvailable()) {
+    IMU.readMagneticField(xm, ym, zm);
   }
 
   unsigned long t = millis();
@@ -97,6 +112,9 @@ void loop(){
       xgCharacteristic.writeValue(xg);
       ygCharacteristic.writeValue(yg);
       zgCharacteristic.writeValue(zg);
+      xmCharacteristic.writeValue(xm);
+      ymCharacteristic.writeValue(ym);
+      zmCharacteristic.writeValue(zm);
       prevTime = t;
     }
   }
@@ -116,6 +134,12 @@ void loop(){
         Serial.print(yg);
         Serial.print('\t');
         Serial.println(zg);
+        Serial.print('\t');
+        Serial.print(xm);
+        Serial.print('\t');
+        Serial.print(ym);
+        Serial.print('\t');
+        Serial.println(zm);
       #endif
       prevTime = t;
     }

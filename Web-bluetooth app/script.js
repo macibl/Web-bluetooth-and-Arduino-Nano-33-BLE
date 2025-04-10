@@ -15,6 +15,10 @@ const xgCharacteristicUUID = "19b10005-e8f2-537e-4f6c-d104768a1214";
 const ygCharacteristicUUID = "19b10006-e8f2-537e-4f6c-d104768a1214";
 const zgCharacteristicUUID = "19b10007-e8f2-537e-4f6c-d104768a1214";
 
+const xmCharacteristicUUID = "19b10008-e8f2-537e-4f6c-d104768a1214";
+const ymCharacteristicUUID = "19b10009-e8f2-537e-4f6c-d104768a1214";
+const zmCharacteristicUUID = "19b10010-e8f2-537e-4f6c-d104768a1214";
+
 async function connect(){
 
     const device = await navigator.bluetooth.requestDevice({filters: [{services: [serviceUUID]}]});
@@ -30,6 +34,10 @@ async function connect(){
     xgCharacteristic = await service.getCharacteristic(xgCharacteristicUUID);
     ygCharacteristic = await service.getCharacteristic(ygCharacteristicUUID);
     zgCharacteristic = await service.getCharacteristic(zgCharacteristicUUID);
+    
+    xmCharacteristic = await service.getCharacteristic(xmCharacteristicUUID);
+    ymCharacteristic = await service.getCharacteristic(ymCharacteristicUUID);
+    zmCharacteristic = await service.getCharacteristic(zmCharacteristicUUID);
 
     await xCharacteristic.startNotifications();
     await yCharacteristic.startNotifications();
@@ -38,6 +46,10 @@ async function connect(){
     await xgCharacteristic.startNotifications();
     await ygCharacteristic.startNotifications();
     await zgCharacteristic.startNotifications();
+    
+    await xmCharacteristic.startNotifications();
+    await ymCharacteristic.startNotifications();
+    await zmCharacteristic.startNotifications();
 
     xCharacteristic.addEventListener('characteristicvaluechanged', readX);
     yCharacteristic.addEventListener('characteristicvaluechanged', readY);
@@ -47,6 +59,9 @@ async function connect(){
     ygCharacteristic.addEventListener('characteristicvaluechanged', readYG);
     zgCharacteristic.addEventListener('characteristicvaluechanged', readZG);
 
+    xmCharacteristic.addEventListener('characteristicvaluechanged', readXM);
+    ymCharacteristic.addEventListener('characteristicvaluechanged', readYM);
+    zmCharacteristic.addEventListener('characteristicvaluechanged', readZM);
 }
 
 function readX(event) {
@@ -83,6 +98,24 @@ function readZG(event) {
     zg = event.target.value.getFloat32(0, true);
     zg = parseFloat(zg.toFixed(2));
     document.getElementById('zg').textContent = zg;
+} 
+
+function readXM(event) {
+    xm = event.target.value.getFloat32(0, true);
+    xm = parseFloat(xm.toFixed(2));
+    document.getElementById('xm').textContent = xm;
+}
+
+function readYM(event) {
+    ym = event.target.value.getFloat32(0, true);
+    ym = parseFloat(ym.toFixed(2));
+    document.getElementById('ym').textContent = ym;
+}
+
+function readZM(event) {
+    zm = event.target.value.getFloat32(0, true);
+    zm = parseFloat(zm.toFixed(2));
+    document.getElementById('zm').textContent = zm;
 } 
 
 async function toggleLED(){
