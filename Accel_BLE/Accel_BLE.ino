@@ -11,6 +11,11 @@ BLEFloatCharacteristic zCharacteristic("19b10003-e8f2-537e-4f6c-d104768a1214", B
 
 BLEBoolCharacteristic ledCharacteristic("19b10004-e8f2-537e-4f6c-d104768a1214", BLERead | BLEWrite);
 
+BLEFloatCharacteristic xgCharacteristic("19b10005-e8f2-537e-4f6c-d104768a1214", BLENotify);
+BLEFloatCharacteristic ygCharacteristic("19b10006-e8f2-537e-4f6c-d104768a1214", BLENotify);
+BLEFloatCharacteristic zgCharacteristic("19b10007-e8f2-537e-4f6c-d104768a1214", BLENotify);
+
+
 BLEDevice central;
 
 void setup(){
@@ -40,6 +45,10 @@ void setup(){
   
   accelService.addCharacteristic(ledCharacteristic);
 
+  accelService.addCharacteristic(xgCharacteristic);
+  accelService.addCharacteristic(ygCharacteristic);
+  accelService.addCharacteristic(zgCharacteristic);
+
   BLE.addService(accelService);
 
   ledCharacteristic.writeValue(0);
@@ -50,7 +59,7 @@ void setup(){
   BLE.advertise();
 
   //delay(2000);    // 2 second
-  Serial.println("Accel begin");
+  Serial.println("IMU begin");
 
   Serial.print("Accelerometer sample rate = ");
   Serial.print(IMU.accelerationSampleRate());
@@ -85,6 +94,9 @@ void loop(){
       xCharacteristic.writeValue(x);
       yCharacteristic.writeValue(y);
       zCharacteristic.writeValue(z);
+      xgCharacteristic.writeValue(xg);
+      ygCharacteristic.writeValue(yg);
+      zgCharacteristic.writeValue(zg);
       prevTime = t;
     }
   }
