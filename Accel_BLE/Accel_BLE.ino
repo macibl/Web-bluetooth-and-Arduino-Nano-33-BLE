@@ -1,4 +1,11 @@
 #include <ArduinoBLE.h>
+
+/* The ArduinoLSM9DS1 library takes care of the sensor initialization and sets its values as follows:
+- Accelerometer range is set at ±4 g with a resolution of 0.122 mg.
+- Gyroscope range is set at ±2000 dps (degrees per second) with a resolution of 70 mdps.
+- Magnetometer range is set at ±400 uT (microTesla) with a resolution of 0.014 uT.
+- Accelerometer and gyrospcope output data rate is fixed at 119 Hz.
+- Magnetometer output data rate is fixed at 20 Hz. */
 #include <Arduino_LSM9DS1.h>
 
 #define DEBUGBLE
@@ -91,8 +98,11 @@ void loop(){
   float x, y, z;
   float xg, yg, zg;
   float xm, ym, zm;
+  float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};    // vector to hold quaternion
 
-  IMU.readAcceleration(x, y, z);
+  if (IMU.accelerationAvailable()) {
+    IMU.readAcceleration(x, y, z);
+  }
 
   if (IMU.gyroscopeAvailable()) {
     IMU.readGyroscope(xg, yg, zg);
@@ -105,7 +115,7 @@ void loop(){
   unsigned long t = millis();
 
   if(central.connected()){
-    if(t - prevTime > 100){
+    if(t - prevTime > 500){
       xCharacteristic.writeValue(x);
       yCharacteristic.writeValue(y);
       zCharacteristic.writeValue(z);
@@ -133,7 +143,7 @@ void loop(){
         Serial.print('\t');
         Serial.print(yg);
         Serial.print('\t');
-        Serial.println(zg);
+        Serial.print(zg);
         Serial.print('\t');
         Serial.print(xm);
         Serial.print('\t');
@@ -166,3 +176,4 @@ void disconnectHandler(BLEDevice central){
   Serial.print("Disconnected from: ");
   Serial.println(central.address());
 }
+
